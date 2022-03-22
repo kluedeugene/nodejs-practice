@@ -96,12 +96,11 @@ var app = http.createServer(function (request, response) {
 			var post = qs.parse(body);
 			var title = post.title;
 			var description = post.description;
-
-			console.log(post.title);
-			console.log(post.description);
+			fs.writeFile(`data/${title}`, description, 'utf-8', function (err) {
+				response.writeHead(302, { Location: `/?id=${title}` });
+				response.end();
+			});
 		});
-		response.writeHead(200);
-		response.end('success');
 	} else {
 		console.log('process not found');
 		response.writeHead(404);
