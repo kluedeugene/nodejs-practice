@@ -1,6 +1,7 @@
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
+var qs = require('querystring');
 
 function templateHTML(title, list, body) {
 	return `
@@ -33,6 +34,7 @@ function templateList(filelist) {
 }
 
 var app = http.createServer(function (request, response) {
+	//request 요청할때 웹브라우저가 보낸 정보, response 응답할때 우리가 웹브라우저에게 전송할 정보
 	var _url = request.url;
 	var queryData = url.parse(_url, true).query;
 	var pathname = url.parse(_url, true).pathname;
@@ -70,7 +72,7 @@ var app = http.createServer(function (request, response) {
 				title,
 				list,
 				`
-			<form action="http//localhost:3000/process create" method="post">
+				<form action= "http://localhost:3000/create_process" method="post">
 			<p><input type="text" name="title" placeholder="title"></p>
             <p>
               <textarea name="description" placeholder="description"></textarea>
@@ -84,7 +86,24 @@ var app = http.createServer(function (request, response) {
 			response.writeHead(200);
 			response.end(template);
 		});
+	} else if (pathname === '/create_process') {
+		var body = '';
+		request.on('data', function (data) {
+			// callback.
+			body = body + data;
+		});
+		request.on('end', function () {
+			var post = qs.parse(body);
+			var title = post.title;
+			var description = post.description;
+
+			console.log(post.title);
+			console.log(post.description);
+		});
+		response.writeHead(200);
+		response.end('success');
 	} else {
+		console.log('process not found');
 		response.writeHead(404);
 		response.end('Not found');
 	}
