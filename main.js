@@ -3,6 +3,37 @@ var fs = require('fs');
 var url = require('url');
 var qs = require('querystring');
 
+var template = {
+	html: function (title, list, body, control) {
+		return `
+	  <!doctype html>
+	  <html>
+	  <head>
+		<title>WEB - ${title}</title>
+		<meta charset="utf-8">
+	  </head>
+	  <body>
+		<h1><a href="/">WEB</a></h1>
+	   ${list}
+	   ${control}
+	   ${body}
+	  </body>
+	  </html>
+	  `;
+	},
+	list: function (filelist) {
+		var list = '<ul>';
+
+		var i = 0;
+		while (i < filelist.length) {
+			list = list + `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+			i = i + 1;
+		}
+		list = list + '</ul>';
+		return list;
+	}
+};
+
 function templateHTML(title, list, body, control) {
 	return `
   <!doctype html>
@@ -45,10 +76,16 @@ var app = http.createServer(function (request, response) {
 				console.log(filelist);
 				var title = 'Welcome';
 				var description = '';
-				var list = templateList(filelist);
-				var template = templateHTML(title, list, `<h2>${title}</h2>${description}`, `<a href="/create">create</a>`);
+
+				// var list = templateList(filelist);
+				// var template = templateHTML(title, list, `<h2>${title}</h2>${description}`, `<a href="/create">create</a>`);
+				// response.writeHead(200);
+				// response.end(template);
+
+				var list = template.list(filelist);
+				var html = template.html(title, list, `<h2>${title}</h2>${description}`, `<a href="/create">create</a>`);
 				response.writeHead(200);
-				response.end(template);
+				response.end(html);
 			});
 		} else {
 			fs.readdir('./data/', function (err, filelist) {
@@ -61,7 +98,14 @@ var app = http.createServer(function (request, response) {
 						title,
 						list,
 						`<h2>${title}</h2>${description}`,
-						`<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+						`<a href="/create">create</a> 
+						<a href="/update?id=${title}">update</a>
+						<form action="delete_process" method="post >   //get 방식으로하면 링크가생성되기때문에 링크공유등의 문제가 발생할수있다.
+						<input type="hidden" name="id" value=${title}>
+						<input type="submit" value="delete">
+						</form>
+						
+						`
 					);
 					response.writeHead(200);
 					response.end(template);
