@@ -93,8 +93,8 @@ var app = http.createServer(function (request, response) {
 
 				fs.readFile(`data/${queryData.id}`, 'utf8', function (err, description) {
 					var title = queryData.id;
-					var list = templateList(filelist);
-					var template = templateHTML(
+					var list = template.list(filelist);
+					var html = template.html(
 						title,
 						list,
 
@@ -110,7 +110,7 @@ var app = http.createServer(function (request, response) {
 						//delete를 get 방식으로하면 링크가생성되기때문에 링크공유등의 문제가 발생할수있다.
 					);
 					response.writeHead(200);
-					response.end(template);
+					response.end(html);
 				});
 			});
 		}
@@ -118,8 +118,8 @@ var app = http.createServer(function (request, response) {
 		fs.readdir('./data/', function (err, filelist) {
 			console.log(filelist);
 			var title = 'WEB- Create';
-			var list = templateList(filelist);
-			var template = templateHTML(
+			var list = template.list(filelist);
+			var html = template.html(
 				title,
 				list,
 				`
@@ -136,7 +136,7 @@ var app = http.createServer(function (request, response) {
 				''
 			);
 			response.writeHead(200);
-			response.end(template);
+			response.end(html);
 		});
 	} else if (pathname === '/create_process') {
 		var body = '';
@@ -157,8 +157,8 @@ var app = http.createServer(function (request, response) {
 		fs.readdir('./data/', function (err, filelist) {
 			fs.readFile(`data/${queryData.id}`, 'utf8', function (err, description) {
 				var title = queryData.id;
-				var list = templateList(filelist);
-				var template = templateHTML(
+				var list = template.list(filelist);
+				var html = template.html(
 					title,
 					list,
 					`
@@ -177,7 +177,7 @@ var app = http.createServer(function (request, response) {
 					`<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
 				);
 				response.writeHead(200);
-				response.end(template);
+				response.end(html);
 			});
 		});
 	} else if (pathname === '/update_process') {
