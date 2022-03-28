@@ -3,6 +3,7 @@ var fs = require('fs');
 var url = require('url');
 var qs = require('querystring');
 var template = require('./lib/template.js');
+var path = require('path');
 
 var app = http.createServer(function (request, response) {
 	//request 요청할때 웹브라우저가 보낸 정보, response 응답할때 우리가 웹브라우저에게 전송할 정보
@@ -29,9 +30,8 @@ var app = http.createServer(function (request, response) {
 			});
 		} else {
 			fs.readdir('./data/', function (err, filelist) {
-				console.log(filelist);
-
-				fs.readFile(`data/${queryData.id}`, 'utf8', function (err, description) {
+				var filteredId = path.parse(queryData.id).base;
+				fs.readFile(`data/${filteredId}`, 'utf8', function (err, description) {
 					var title = queryData.id;
 					var list = template.list(filelist);
 					var html = template.html(
@@ -95,7 +95,8 @@ var app = http.createServer(function (request, response) {
 		});
 	} else if (pathname === '/update') {
 		fs.readdir('./data/', function (err, filelist) {
-			fs.readFile(`data/${queryData.id}`, 'utf8', function (err, description) {
+			var filteredId = path.parse(queryData.id).base;
+			fs.readFile(`data/${filteredId}`, 'utf8', function (err, description) {
 				var title = queryData.id;
 				var list = template.list(filelist);
 				var html = template.html(
@@ -150,8 +151,9 @@ var app = http.createServer(function (request, response) {
 		request.on('end', function () {
 			var post = qs.parse(body);
 			var id = post.id;
-			console.log(`${id} is deleted`);
-			fs.unlink(`data/${id}`, function (error) {
+			var filteredId = path.parse(id).base;
+			console.log(`${filteredId} is deleted`);
+			fs.unlink(`data/${filteredId}`, function (error) {
 				response.writeHead(302, { Location: `/` }); //리다이렉션 홈으로
 				response.end();
 			});
